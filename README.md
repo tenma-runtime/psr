@@ -14,7 +14,7 @@ use Tenma\Psr\Psr;
 
 $app = /* any Psr\Http\Server\RequestHandlerInterface, e.g. a Slim app */;
 
-Tenma::serve(3000, Psr::handler($app, new Psr17Factory()));
+new Http\Server(3000, Psr::handler($app, new Psr17Factory()))->start();
 ```
 
 ```bash
@@ -43,7 +43,7 @@ chunks, so a file stream doesn't end up in memory. Several values of a header (`
 PSR-7 has no word for them. `Upgrade` is a response that carries one of Tenma's:
 
 ```php
-use Tenma\Http\{EventStream, Response, WebSocket};
+use Http\{EventStream, Response, WebSocket};
 use Tenma\Psr\Upgrade;
 
 $app->get('/ws', fn ($request, $response) => new Upgrade($response, Response::websocket(function (WebSocket $socket) {
@@ -71,7 +71,7 @@ it changes what an app may do:
 - `$_GET`, `$_POST`, `$_SESSION`, `header()`, `echo` and `exit` belong to classic PHP; a PSR app uses the
   request and response objects instead.
 - Blocking calls (PDO, curl, `file_get_contents`) hold up every request of the worker while they wait. Tenma's
-  own APIs (`Tenma::fetch()`, `Tenma\Db`, `Tenma\Fs`) wait without blocking.
+  own APIs (`Http\Client`, `Data\Postgres`, `FileSystem\FileInfo`) wait without blocking.
 
 ## Tests
 

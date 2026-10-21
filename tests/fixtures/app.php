@@ -4,7 +4,7 @@
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Psr\Http\Message\{ResponseInterface, ServerRequestInterface, UploadedFileInterface};
 use Psr\Http\Server\RequestHandlerInterface;
-use Tenma\Http\{EventStream, Response, WebSocket};
+use Http\{EventStream, Response, WebSocket};
 use Tenma\Psr\{Psr, Upgrade};
 
 require __DIR__ . '/../../vendor/autoload.php';
@@ -52,4 +52,4 @@ $app = new class ($factory) implements RequestHandlerInterface {
     }
 };
 
-Tenma::serve((int) ($argv[1] ?? 8124), Psr::handler($app, $factory));
+new \Http\Server((int) ($argv[1] ?? 8124), Psr::handler($app, $factory))->start();

@@ -5,10 +5,10 @@ namespace Tenma\Psr;
 use Closure;
 use Psr\Http\Message\{ResponseInterface, ServerRequestFactoryInterface, ServerRequestInterface, StreamFactoryInterface, UploadedFileFactoryInterface};
 use Psr\Http\Server\RequestHandlerInterface;
-use Tenma\Http\{Request, Response, Stream, StreamedResponse, UploadedFile, WebSocketResponse};
+use Http\{Request, Response, Stream, StreamedResponse, UploadedFile, WebSocketResponse};
 
 /**
- * Runs a PSR-15 app under Tenma: `Tenma::serve(3000, Psr::handler($app, new Psr17Factory()))`. Every request
+ * Runs a PSR-15 app under Tenma: `new \Http\Server(3000, Psr::handler($app, new Psr17Factory()))->start()`. Every request
  * becomes a PSR-7 ServerRequest built with the PSR-17 factory you pass (nyholm/psr7, guzzlehttp/psr7, ...);
  * the app's response goes back as Tenma's. A WebSocket or a stream goes out through Upgrade.
  *

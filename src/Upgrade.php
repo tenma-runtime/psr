@@ -3,12 +3,12 @@
 namespace Tenma\Psr;
 
 use Psr\Http\Message\{ResponseInterface, StreamInterface};
-use Tenma\Http\{StreamedResponse, WebSocketResponse};
+use Http\{StreamedResponse, WebSocketResponse};
 
 /**
  * A response that hands the connection to Tenma: a WebSocket or a stream instead of a body.
  *
- *     return new Upgrade($response, \Tenma\Http\Response::websocket(function (WebSocket $socket) { ... }));
+ *     return new Upgrade($response, \Http\Response::websocket(function (WebSocket $socket) { ... }));
  *
  * Middlewares may change it like any response: it stays an Upgrade, and for a stream the headers they add
  * (CORS, security headers, cookies) go out with it. Only Psr::handler() understands it; another server sends
