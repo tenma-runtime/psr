@@ -1,6 +1,6 @@
 # Tenma PSR
 
-Runs any PSR-15 app under [Tenma](https://tenma.dev): Slim, Mezzio, Waypoint, or a handler of your own.
+Runs any PSR-15 app under [Tenma](https://tenma.dev): Slim, Mezzio, Io, or a handler of your own.
 Requests arrive as PSR-7 `ServerRequestInterface`, built with the PSR-17 factory you choose; the app's
 `ResponseInterface` goes back as Tenma's response.
 
