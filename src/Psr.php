@@ -46,8 +46,12 @@ final class Psr
             'REQUEST_TIME' => time(),
             'REQUEST_TIME_FLOAT' => microtime(true),
         ];
-        // Tenma speaks plain HTTP; TLS ends at a proxy, whose X-Forwarded-Proto isn't trusted here
-        $uri = 'http://' . self::authority($request) . $request->path . ($queryString !== '' ? "?$queryString" : '');
+        // Over Tenma's own TLS (--tls-cert); behind a proxy that ends TLS it is plain http, X-Forwarded-Proto isn't trusted here
+        if ($request->https) {
+            $server['HTTPS'] = 'on';
+        }
+        $scheme = $request->https ? 'https' : 'http';
+        $uri = "$scheme://" . self::authority($request) . $request->path . ($queryString !== '' ? "?$queryString" : '');
         $psr = $factory->createServerRequest($request->method, $uri, $server)
             ->withQueryParams($request->query)
             ->withCookieParams($request->cookies())

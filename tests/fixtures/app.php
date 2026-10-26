@@ -27,6 +27,7 @@ $app = new class ($factory) implements RequestHandlerInterface {
                 'body' => (string) $request->getBody(),
                 'files' => array_map(fn (UploadedFileInterface $file) => [$file->getClientFilename(), $file->getClientMediaType(), $file->getSize(), (string) $file->getStream()], $request->getUploadedFiles()),
                 'remote' => $request->getServerParams()['REMOTE_ADDR'] ?? null,
+                'https' => $request->getServerParams()['HTTPS'] ?? null,
             ]),
             '/big' => $this->factory->createResponse()->withBody($this->factory->createStream(str_repeat('x', 3 * 1024 * 1024))),
             '/cookies' => $this->factory->createResponse()->withAddedHeader('Set-Cookie', 'a=1')->withAddedHeader('Set-Cookie', 'b=2'),

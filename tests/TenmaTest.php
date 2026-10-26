@@ -117,4 +117,49 @@ final class TenmaTest extends TestCase
 
         $this->assertSame('echo: hi', $reply);
     }
+
+    public function testOverTenmasOwnTlsTheRequestIsHttps(): void
+    {
+        $dir = sys_get_temp_dir() . '/tenma-psr-tls-' . getmypid();
+        @mkdir($dir);
+        $key = openssl_pkey_new(['private_key_type' => OPENSSL_KEYTYPE_EC, 'curve_name' => 'prime256v1']);
+        $csr = openssl_csr_new(['commonName' => '127.0.0.1'], $key);
+        openssl_x509_export(openssl_csr_sign($csr, null, $key, 1), $cert);
+        openssl_pkey_export($key, $pem);
+        file_put_contents("$dir/cert.pem", $cert);
+        file_put_contents("$dir/key.pem", $pem);
+
+        $tenma = getenv('TENMA_BIN') ?: trim((string) shell_exec('command -v tenma'));
+        $port = self::$port + 1;
+        $command = [
+            $tenma,
+            '--tls-cert', "$dir/cert.pem",
+            '--tls-key', "$dir/key.pem",
+            __DIR__ . '/fixtures/app.php',
+            (string) $port,
+        ];
+        $server = proc_open($command, [1 => ['file', '/dev/null', 'w'], 2 => ['file', '/dev/null', 'w']], $pipes);
+        $this->assertNotFalse($server);
+
+        $curl = curl_init("https://127.0.0.1:$port/echo");
+        curl_setopt_array($curl, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT => 5,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => 0,
+        ]);
+        for ($i = 0; $i < 100 && ($body = curl_exec($curl)) === false; $i++) {
+            usleep(50_000);
+        }
+        // An open keep-alive connection would hold Tenma's shutdown for --stop-timeout
+        unset($curl);
+        proc_terminate($server);
+        proc_close($server);
+        array_map(unlink(...), glob("$dir/*.pem") ?: []);
+        rmdir($dir);
+
+        $echo = json_decode((string) $body, true);
+        $this->assertSame("https://127.0.0.1:$port/echo", $echo['uri']);
+        $this->assertSame('on', $echo['https']);
+    }
 }
